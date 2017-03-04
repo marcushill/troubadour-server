@@ -25,7 +25,7 @@ export default class Searcher {
   search(term, page) {
     const params = {};
 
-    if(Number.isInteger(page)){
+    if(Number.isInteger(page)) {
       params.limit = 20;
       params.offet = 20 * page;
     }
@@ -42,13 +42,13 @@ export default class Searcher {
       });
   }
 
-  _transformSpotifyObj(obj){
+  _transformSpotifyObj(obj) {
     return {
       spotify_id: obj.id,
       images: obj.images,
       type: obj.type,
       name: obj.name,
-      uri: obj.uri
-    }
+      uri: obj.uri,
+    };
   }
 }
