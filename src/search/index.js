@@ -29,9 +29,26 @@ export default class Searcher {
       params.limit = 20;
       params.offet = 20 * page;
     }
-    return this.spotifyApi.search(term, ['album', 'artist', 'track'])
+    return this.spotifyApi.search(term, ['album', 'artist', 'track'], params)
       .then((result) => {
-        return result;
+        const data = result.body;
+        const albumObjs = data.albums.items.map(this._transformSpotifyObj);
+        const combined = albumObjs.concat(
+          data.artists.items.map(this._transformSpotifyObj),
+          data.tracks.items.map(this._transformSpotifyObj)
+        );
+
+        return combined;
       });
+  }
+
+  _transformSpotifyObj(obj){
+    return {
+      spotify_id: obj.id,
+      images: obj.images,
+      type: obj.type,
+      name: obj.name,
+      uri: obj.uri
+    }
   }
 }

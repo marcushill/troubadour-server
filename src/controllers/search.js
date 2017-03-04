@@ -7,7 +7,8 @@ const app = express();
 const searcher = new Searcher();
 
 app.get('/', function(req, res) {
-  searcher.search(req.query.q, req.query.page).then((response) => {
+  searcher.search(req.query.q, req.query.page)
+  .then((response) => {
     res.json(response);
   })
   .catch((err) => {
