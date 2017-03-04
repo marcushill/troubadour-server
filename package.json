@@ -1,0 +1,32 @@
+{
+  "name": "troubadour-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint src",
+    "eslint-fix": "eslint --fix src",
+    "clean": "rimraf out/",
+    "build": "npm run eslint && npm run clean && babel src --out-dir out/",
+    "start": "node out/main.js",
+    "start-dev": "babel-watch src/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.0",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.0",
+    "sequelize": "^3.30.2",
+    "spotify-web-api-node": "^2.3.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-preset-env": "^1.2.0",
+    "eslint": "^3.17.0",
+    "eslint-config-google": "^0.7.1"
+  }
+}
