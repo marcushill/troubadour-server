@@ -29,7 +29,7 @@ SPOTIFY_CLIENT=<Spotify Client ID>
 SPOTIFY_SECRET=<Spotify Client Secret>
 REDIS_HOST=localhost
 ```
-Do **NOT** add this file to source control. It is already in the gitignore.
+Do **NOT** add this file to source control. It is already in the `.gitignore`.
 5. Run the server:
 
   In Development mode:

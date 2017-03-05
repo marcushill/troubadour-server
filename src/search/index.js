@@ -25,7 +25,8 @@ export default class Searcher {
   search(term, page) {
     const params = {};
 
-    if(Number.isInteger(page)) {
+    if(Number.isInteger(page) && page > 0) {
+      page = page -1;
       params.limit = 20;
       params.offet = 20 * page;
     }
