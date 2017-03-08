@@ -4,13 +4,11 @@ import {createCachedFunction} from '../cache';
 
 const app = new Router();
 
-// We can keep one of these since it doesn't require a user token
-const searcher = new Searcher();
-const search = createCachedFunction(searcher.search,
-   {context: searcher, namespace: 'searchController'});
-
 app.get('/', async (req, res) => {
   try {
+    const searcher = new Searcher();
+    const search = createCachedFunction(searcher.search,
+       {context: searcher, namespace: 'searchController'});
     let response = await search(req.query.q, req.query.page);
     res.json(response);
   } catch (err) {
