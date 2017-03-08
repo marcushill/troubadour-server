@@ -9,8 +9,8 @@ app.get('/', async (req, res) => {
     const searcher = new Searcher();
     const search = createCachedFunction(searcher.search,
        {context: searcher, namespace: 'searchController'});
-    let response = await search(req.query.q, req.query.page);
-    res.json(response);
+    let data = await search(req.query.q, req.query.page);
+    res.json({data});
   } catch (err) {
     // Fix this.
     console.log('Error happening');

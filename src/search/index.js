@@ -35,12 +35,11 @@ export default class Searcher {
                            .search(term, ['album', 'artist', 'track'], params);
 
     const data = result.body;
-    const albumObjs = data.albums.items.map(this._transformSpotifyObj);
-    const combined = albumObjs.concat(
-      data.artists.items.map(this._transformSpotifyObj),
-      data.tracks.items.map(this._transformSpotifyObj)
-    );
-    return combined;
+    return {
+        artists: data.artists.items.map(this._transformSpotifyObj),
+        tracks: data.tracks.items.map(this._transformSpotifyObj),
+        albums: data.albums.items.map(this._transformSpotifyObj),
+    };
   }
 
   _transformSpotifyObj(obj) {
