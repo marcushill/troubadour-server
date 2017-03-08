@@ -3,6 +3,7 @@
 This is the back-end server for the troubadour project. For now, this repo only contains the node server, but eventually it should contain everything needed to run the backend including help for setting up the relevant dependent services.
 
 ## Dependencies
+- A somewhat recent version of node and npm
 - Redis
 - Postgres w/ PostGIS (Not used yet)
 - Docker (**Note:** As of now, the app is set up so that you can run it without running the dependencies in a container. This may change.)

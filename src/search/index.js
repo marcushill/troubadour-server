@@ -22,7 +22,7 @@ export default class Searcher {
       });
   }
 
-  search(term, page) {
+  async search(term, page) {
     const params = {};
 
     if(Number.isInteger(page) && page > 0) {
@@ -30,17 +30,17 @@ export default class Searcher {
       params.limit = 20;
       params.offet = 20 * page;
     }
-    return this.spotifyApi.search(term, ['album', 'artist', 'track'], params)
-      .then((result) => {
-        const data = result.body;
-        const albumObjs = data.albums.items.map(this._transformSpotifyObj);
-        const combined = albumObjs.concat(
-          data.artists.items.map(this._transformSpotifyObj),
-          data.tracks.items.map(this._transformSpotifyObj)
-        );
 
-        return combined;
-      });
+    let result = await this.spotifyApi
+                           .search(term, ['album', 'artist', 'track'], params);
+
+    const data = result.body;
+    const albumObjs = data.albums.items.map(this._transformSpotifyObj);
+    const combined = albumObjs.concat(
+      data.artists.items.map(this._transformSpotifyObj),
+      data.tracks.items.map(this._transformSpotifyObj)
+    );
+    return combined;
   }
 
   _transformSpotifyObj(obj) {
