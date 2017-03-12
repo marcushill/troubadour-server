@@ -8,7 +8,7 @@
     "eslint": "eslint src",
     "eslint-fix": "eslint --fix src",
     "clean": "rimraf out/",
-    "build": "eslint --fix src && npm run eslint && npm run clean && babel src --out-dir out/",
+    "build": "npm run eslint-fix && npm run eslint && npm run clean && babel src --out-dir out/",
     "start": "node out/main.js",
     "start-dev": "babel-watch src/main.js"
   },
@@ -24,7 +24,10 @@
     "errorhandler": "^1.5.0",
     "express": "^4.15.0",
     "morgan": "^1.8.1",
+    "pg": "^6.1.4",
+    "pg-hstore": "^2.3.2",
     "sequelize": "^3.30.2",
+    "sequelize-cli": "^2.5.1",
     "spotify-web-api-node": "^2.3.6"
   },
   "devDependencies": {
