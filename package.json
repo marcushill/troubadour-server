@@ -35,6 +35,7 @@
     "babel-watch": "^2.0.6",
     "eslint": "^3.17.0",
     "eslint-config-google": "^0.7.1",
-    "eslint-plugin-async-await": "0.0.0"
+    "eslint-plugin-async-await": "0.0.0",
+    "jasmine": "^2.5.3"
   }
 }
