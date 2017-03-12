@@ -8,7 +8,7 @@ export default function(sequelize, DataTypes) {
         key: 'user_id',
       },
     },
-    party_location: DataTypes.Geography('Point', 4326),
+    party_location: DataTypes.GEOGRAPHY('Point', 4326), // eslint-disable-line
     in_progress: DataTypes.BOOLEAN,
   }, {timestamps: false, tableName: 'playlist'});
 }

@@ -1,7 +1,7 @@
 // Keep this import first. It does black magic to setup the environment so
 // things don't break mysteriously
 import startup from './startup'; //eslint-disable-line
-import {database} from '.startup';
+// import {database} from '.startup';
 import express from 'express';
 import searchController from './controllers/search';
 import bodyParser from 'body-parser';
