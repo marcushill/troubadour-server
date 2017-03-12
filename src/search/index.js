@@ -37,18 +37,24 @@ export default class Searcher {
     const data = result.body;
     return {
         artists: data.artists.items.map(this._transformSpotifyObj),
-        tracks: data.tracks.items.map(this._transformSpotifyObj),
+        tracks: data.tracks.items.map(this._transformSpotifyObj.bind(this)),
         albums: data.albums.items.map(this._transformSpotifyObj),
     };
   }
 
   _transformSpotifyObj(obj) {
-    return {
+    let data = {
       spotify_id: obj.id,
-      images: obj.images,
+      images: obj.images || [],
       type: obj.type,
       name: obj.name,
       uri: obj.uri,
     };
+
+    if(obj.type === 'track') {
+      data.artists = obj.artists.map(this._transformSpotifyObj);
+    }
+
+    return data;
   }
 }
