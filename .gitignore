@@ -1,5 +1,6 @@
 .env
 out/*
+
 # Logs
 logs
 *.log
@@ -37,3 +38,6 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Redis data
+dump.rdb
