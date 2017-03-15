@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo 'Tests coming soon!'",
+    "test": "jasmine",
     "eslint": "eslint src",
     "eslint-fix": "eslint --fix src",
     "clean": "rimraf out/",
@@ -32,6 +32,7 @@
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
     "babel-preset-env": "^1.2.0",
+    "babel-register": "^6.23.0",
     "babel-watch": "^2.0.6",
     "eslint": "^3.17.0",
     "eslint-config-google": "^0.7.1",
