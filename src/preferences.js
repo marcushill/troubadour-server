@@ -27,4 +27,30 @@ export class Preferences {
     return await searcher.fromSpotifyUris(
       preferences.map((x) => x.spotify_uri));
   }
+
+  async add(newPreferences) {
+    const user = await db.TroubadourUser.findCreateFind({
+      where: {
+        user_id: this.userId
+      },
+      defaults: {user_id: this.userId, updated_at: db.sequelize.fn('NOW')}
+    });
+
+    let finished = await db.Preference.bulkCreate(
+      newPreferences.map(x => Object.assign(x, {user_id: this.userId}))
+    );
+
+    return finished;
+  }
+
+  async delete(spotifyUris) {
+    return db.Preference.destroy({
+      where: {
+        user_id: this.userId,
+        spotify_uri: {
+          $in: spotifyUris
+        }
+      }
+    })
+  }
 }

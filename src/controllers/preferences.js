@@ -19,4 +19,22 @@ app.get('/', async (req, resp) => {
   }
 }); // X-USER-ID
 
+app.put('/', async (req, resp) => {
+  try {
+    let userId = req.get('X-USER-ID');
+    let body = req.body;
+    let data = await new Preferences(userId).add(body);
+    resp.json({data});
+  } catch (error) {
+    resp.status(500).json({error: error.message});
+  }
+});
+
+app.delete('/', async (req, resp) => {
+  let userId = req.get('X-USER-ID');
+  let body = req.body;
+  let data = await new Preferences(userId).delete(body);
+  resp.json({data});
+});
+
 export default app;
