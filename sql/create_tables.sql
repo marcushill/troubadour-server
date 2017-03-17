@@ -13,7 +13,7 @@ CREATE TABLE troubadour_user (
 CREATE TABLE preference (
   preference_id serial PRIMARY KEY,
   user_id text REFERENCES troubadour_user ON DELETE CASCADE,
-  spotify_id text,
+  spotify_uri text,
   name text
 );
 
