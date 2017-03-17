@@ -35,7 +35,6 @@ export class Preferences {
       },
       defaults: {user_id: this.userId, updated_at: db.sequelize.fn('NOW')},
     });
-
     let finished = await db.Preference.bulkCreate(
       newPreferences.map((x) => Object.assign(x, {user_id: this.userId}))
     );

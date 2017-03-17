@@ -4,7 +4,7 @@ export default function(sequelize, DataTypes) {
                     autoIncrement: true,
                     primaryKey: true},
     spotify_uri: DataTypes.TEXT,
-    name: DataTypes.DATE,
+    name: DataTypes.TEXT,
     user_id: {
       type: DataTypes.TEXT,
       references: {
