@@ -12,7 +12,8 @@
     "async-await/space-after-await": 2
   },
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
   "plugins": ["async-await"]
 }
