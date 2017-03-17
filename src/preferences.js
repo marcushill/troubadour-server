@@ -29,15 +29,15 @@ export class Preferences {
   }
 
   async add(newPreferences) {
-    const user = await db.TroubadourUser.findCreateFind({
+    await db.TroubadourUser.findCreateFind({
       where: {
-        user_id: this.userId
+        user_id: this.userId,
       },
-      defaults: {user_id: this.userId, updated_at: db.sequelize.fn('NOW')}
+      defaults: {user_id: this.userId, updated_at: db.sequelize.fn('NOW')},
     });
 
     let finished = await db.Preference.bulkCreate(
-      newPreferences.map(x => Object.assign(x, {user_id: this.userId}))
+      newPreferences.map((x) => Object.assign(x, {user_id: this.userId}))
     );
 
     return finished;
@@ -48,9 +48,9 @@ export class Preferences {
       where: {
         user_id: this.userId,
         spotify_uri: {
-          $in: spotifyUris
-        }
-      }
-    })
+          $in: spotifyUris,
+        },
+      },
+    });
   }
 }
