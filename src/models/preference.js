@@ -1,9 +1,9 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('preference', {
+  return sequelize.define('Preference', {
     preference_id: {type: DataTypes.INTEGER,
                     autoIncrement: true,
                     primaryKey: true},
-    spotify_id: DataTypes.TEXT,
+    spotify_uri: DataTypes.TEXT,
     name: DataTypes.DATE,
     user_id: {
       type: DataTypes.TEXT,

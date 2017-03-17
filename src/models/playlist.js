@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('playlist', {
+  return sequelize.define('Playlist', {
     playlist_id: {type: DataTypes.TEXT, primaryKey: true},
     created_by: {
       type: DataTypes.TEXT,
