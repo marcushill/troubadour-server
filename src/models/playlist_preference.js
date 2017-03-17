@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('playlist_preference', {
+  return sequelize.define('PlaylistPreference', {
     playlist_id: {
       type: DataTypes.TEXT,
       references: {
