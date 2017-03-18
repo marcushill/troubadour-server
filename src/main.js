@@ -3,10 +3,12 @@
 import startup from './startup'; //eslint-disable-line
 // import {database} from '.startup';
 import express from 'express';
-import searchController from './controllers/search';
 import bodyParser from 'body-parser';
 import errorhandler from 'errorhandler';
 import morgan from 'morgan';
+
+import searchController from './controllers/search';
+import preferencesController from './controllers/preferences';
 
 const app = express();
 // for parsing application/json
@@ -27,6 +29,7 @@ app.get('/', function(req, res) {
 });
 
 app.use('/search', searchController);
+app.use('/preferences', preferencesController);
 
 app.listen(process.env.PORT || 3000, function() {
   console.log('Troubadour Server Listening on port 3000');
