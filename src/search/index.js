@@ -99,7 +99,12 @@ export default class Searcher {
     let finished = await Promise.all(promises);
     let data = finished.reduce((out, item) => {
       return Object.assign(out, item);
-    }, {});
+    }, {
+      artists: [],
+      albums: [],
+      tracks: [],
+      //genres: []
+    });
 
     for(let key in data) { // eslint-disable-line guard-for-in
       data[key] = data[key].map(this._transformSpotifyObj.bind(this));
