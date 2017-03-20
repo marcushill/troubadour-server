@@ -1,4 +1,5 @@
 import SpotifyApi from 'spotify-web-api-node';
+import Levenshtein from 'levenshtein';
 
 function groupBy(array, keyFunc=(x)=> x, valueFunc=(x)=> x) {
   // returns an object of {key: []} where key is returned by keyFunc
@@ -10,6 +11,31 @@ function groupBy(array, keyFunc=(x)=> x, valueFunc=(x)=> x) {
     obj[key].push(valueFunc(current));
     return obj;
   }, {});
+}
+
+function getTermSortFunc(term) {
+  return (a, b) => {
+    // Grab the String distance of a and b
+    // If the search term is a prefix of this particular item,
+    // it gets a -.5 boost.
+    // To see why, look at the following example.
+    // term = 'Appl'
+    // 'Apple' and 'Appt' both have a string distance of 1, but we
+    // would like to prefer strings that are a prefix so this will give
+    // 'Apple' a string distance of .5 and Appt a string distance of
+    // 1 so that 'Apple comes first'.
+    let levA = new Levenshtein(term, a.name).distance;
+    levA -= a.name.startsWith(term) ? .5 : 0;
+    let levB = new Levenshtein(term, b.name).distance;
+    levB -= b.name.startsWith(term) ? .5 : 0;
+
+
+     if (levA == levB) {
+        return a.popularity - b.popularity;
+     }
+
+     return levA - levB;
+  };
 }
 
 
@@ -37,6 +63,7 @@ export default class Searcher {
 
   async search(term, page) {
     const params = {};
+    this.term = term;
 
     if(Number.isInteger(page) && page > 0) {
       page = page -1;
@@ -48,11 +75,19 @@ export default class Searcher {
                            .search(term, ['album', 'artist', 'track'], params);
 
     const data = result.body;
-    return {
-        artists: data.artists.items.map(this._transformSpotifyObj),
+    let output = {
+        artists: data.artists.items.
+            map(this._transformSpotifyObj.bind(this)),
         tracks: data.tracks.items.map(this._transformSpotifyObj.bind(this)),
-        albums: data.albums.items.map(this._transformSpotifyObj),
+        albums: data.albums.items.map(this._transformSpotifyObj.bind(this)),
     };
+
+    for(let key of Object.keys(output)) {
+      output[key] = output[key]
+        .sort(getTermSortFunc(term));
+    }
+
+    return output;
   }
 
   async fromSpotifyUris(spotfyUris) {
@@ -117,7 +152,7 @@ export default class Searcher {
     };
 
     if(obj.type === 'track') {
-      data.artists = obj.artists.map(this._transformSpotifyObj);
+      data.artists = obj.artists.map(this._transformSpotifyObj.bind(this));
     }
 
     return data;
