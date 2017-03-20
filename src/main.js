@@ -29,6 +29,7 @@ app.get('/', function(req, res) {
 });
 
 app.use('/search', searchController);
+app.use('/location', locationController)
 app.use('/preferences', preferencesController);
 
 app.listen(process.env.PORT || 3000, function() {
