@@ -11,7 +11,47 @@ const app = new Router();
  *
  * @apiParam {String} q The query text
  * @apiParam {Number} [page] Which page of size 20 you want. Starts from 1
- * @apiExample {}
+
+ * @apiSuccess {Object} data Wrapper for the response arrays
+ * @apiSuccess {Object[]} data.artists
+ * @apiSuccess {Object[]} data.albums
+ * @apiSuccess {Object[]} data.tracks
+ * @apiExample {} Example usage:
+ *    GET /search?q=beyonce
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "data" : {
+ *          "artists": [
+ *            {
+                 "spotify_id": "6vWDO969PvNqNYHIOW5v0m",
+                 "images": [],
+                 "type": "artist",
+                 "name": "Beyoncé",
+                 "uri": "spotify:artist:6vWDO969PvNqNYHIOW5v0m"
+               }
+ *          ],
+ *          "tracks": [
+ *            {
+                "spotify_id": "02M6vucOvmRfMxTXDUwRXu",
+                "images": [],
+                "type": "track",
+                "name": "7/11",
+                "uri": "spotify:track:02M6vucOvmRfMxTXDUwRXu",
+                "artists": [
+                  {
+                    "spotify_id": "6vWDO969PvNqNYHIOW5v0m",
+                    "images": [],
+                    "type": "artist",
+                    "name": "Beyoncé",
+                    "uri": "spotify:artist:6vWDO969PvNqNYHIOW5v0m"
+                  }
+                ]
+              },...
+ *          ]
+ *          "albums": [...]
+ *       }
+ *     }
  */
 app.get('/', async (req, res) => {
   try {
