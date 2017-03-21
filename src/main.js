@@ -10,6 +10,8 @@ import morgan from 'morgan';
 import searchController from './controllers/search';
 import locationController from './controllers/location';
 import preferencesController from './controllers/preferences';
+import nearbyController from './controllers/nearby';
+
 
 const app = express();
 // for parsing application/json
@@ -32,8 +34,10 @@ app.get('/', function(req, res) {
 app.use('/search', searchController);
 app.use('/location', locationController);
 app.use('/preferences', preferencesController);
+app.use('/nearby', nearbyController);
+
 if (process.env.NODE_ENV === 'development') {
-  app.use('/docs', express.static('out/docs'));  
+  app.use('/docs', express.static('out/docs'));
 } else {
   app.use('/docs', express.static('docs'));
 }
