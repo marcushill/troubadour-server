@@ -8,6 +8,7 @@ import errorhandler from 'errorhandler';
 import morgan from 'morgan';
 
 import searchController from './controllers/search';
+import locationController from './controllers/location';
 import preferencesController from './controllers/preferences';
 
 const app = express();
