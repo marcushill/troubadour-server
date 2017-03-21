@@ -11,6 +11,7 @@ const app = new Router();
  *
  * @apiParam {String} q The query text
  * @apiParam {Number} [page] Which page of size 20 you want. Starts from 1
+ * @apiExample {}
  */
 app.get('/', async (req, res) => {
   try {
