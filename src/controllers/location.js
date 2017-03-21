@@ -13,7 +13,7 @@ app.put('/', async (req, resp) => {
   try {
     let userId = req.get('X-USER-ID');
     let body = req.body;
-    let data = await new Location(userId).add(body);
+    let data = await new UserLocation(userId).update(body);
     resp.json({data});
   } catch (error) {
     resp.status(500).json({error: error.message});
