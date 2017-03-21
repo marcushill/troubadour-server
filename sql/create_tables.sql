@@ -6,7 +6,7 @@ CREATE EXTENSION postgis;
 CREATE TABLE troubadour_user (
   user_id text PRIMARY KEY,
   spotify_id text,
-  last_location geography(POINT,4326),
+  last_location geography(POINT, 4326),
   updated_at timestamp with time zone
 );
 

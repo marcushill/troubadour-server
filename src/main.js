@@ -8,6 +8,7 @@ import errorhandler from 'errorhandler';
 import morgan from 'morgan';
 
 import searchController from './controllers/search';
+import locationController from './controllers/location';
 import preferencesController from './controllers/preferences';
 
 const app = express();
@@ -29,6 +30,7 @@ app.get('/', function(req, res) {
 });
 
 app.use('/search', searchController);
+app.use('/location', locationController);
 app.use('/preferences', preferencesController);
 
 app.listen(process.env.PORT || 3000, function() {
