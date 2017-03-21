@@ -8,7 +8,9 @@
     "eslint": "eslint src",
     "eslint-fix": "eslint --fix src",
     "clean": "rimraf out/",
-    "build": "npm run eslint-fix && npm run eslint && npm run clean && babel src --out-dir out/",
+    "build-docs": "apidoc -i src/ -o out/docs/ -f \"controllers/.*\\.js\"",
+    "pre-build": "npm run eslint-fix && npm run eslint && npm run clean",
+    "build": "npm run pre-build && npm run build-docs && babel src --out-dir out/",
     "start": "node out/main.js",
     "start-dev": "babel-watch src/main.js"
   },
@@ -16,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apidoc": "^0.17.5",
     "babel-polyfill": "^6.23.0",
     "body-parser": "^1.17.0",
     "cache-manager": "^2.4.0",
