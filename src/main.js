@@ -32,7 +32,11 @@ app.get('/', function(req, res) {
 app.use('/search', searchController);
 app.use('/location', locationController);
 app.use('/preferences', preferencesController);
-app.use('/docs', express.static('out/docs'));
+if (process.env.NODE_ENV === 'development') {
+  app.use('/docs', express.static('out/docs'));  
+} else {
+  app.use('/docs', express.static('docs'));
+}
 
 app.listen(process.env.PORT || 3000, function() {
   console.log('Troubadour Server Listening on port 3000');
