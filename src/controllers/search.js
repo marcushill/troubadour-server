@@ -16,7 +16,7 @@ const app = new Router();
  * @apiSuccess {Object[]} data.artists
  * @apiSuccess {Object[]} data.albums
  * @apiSuccess {Object[]} data.tracks
- * @apiExample {} Example usage:
+ * @apiExample Example usage:
  *    GET /search?q=beyonce
  * @apiSuccessExample {json} Success-Response:
  *     HTTP/1.1 200 OK
