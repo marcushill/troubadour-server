@@ -1,11 +1,11 @@
 import {database as db} from './startup';
 
-export class Location {
+export class UserLocation {
   constructor(userId) {
     this.userId = userId;
   }
 
-  async add(newLocation) {
+  async update(newLocation) {
     let finished = db.TroubadourUser.upsert({
         user_id: this.userId,
         updated_at: db.sequelize.fn('NOW'),
