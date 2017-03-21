@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {requireHeader} from '../middleware';
-import {Location} from '../location';
+import {UserLocation} from '../location';
 
 const app = new Router();
 
