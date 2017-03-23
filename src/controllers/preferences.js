@@ -63,23 +63,22 @@ app.put('/', async (req, resp) => {
 });
 
 /**
- * @api {delete} /preferences Delete Preferences
+ * @api {delete} /preferences?ids=:ids Delete Preferences
  * @apiName Delete User Preferences
  * @apiGroup Preferences
  * @apiHeader {String} X-USER-ID The ID of the current user
  *
- * @apiParam {String[]} body The list of preferences to add
- * @apiParam {Object} body.item A string representing the Spotify uri
+ * @apiParam {String[]} ids The list of preferences to delete
+ * @apiParam {Object}  ids.item A string representing the Spotify uri
  * @apiExample Example usage:
- *  DELETE /preferences
- *  [
- *   "spotify:artist:6vWDO969PvNqNYHIOW5v0m"
- *  ]
+ *  DELETE /preferences?ids=spotify:artist:6vWDO969PvNqNYHIOW5v0m,
+ *   spotify:artist:23zg3TcAtWQy7J6upgbUnj
  */
 app.delete('/', async (req, resp) => {
   let userId = req.get('X-USER-ID');
-  let body = req.body;
-  let data = await new Preferences(userId).delete(body);
+  let ids = req.query.ids.split(',');
+  console.log(ids);
+  let data = await new Preferences(userId).delete(ids);
   resp.json({data});
 });
 

@@ -33,7 +33,7 @@ app.use('/search', searchController);
 app.use('/location', locationController);
 app.use('/preferences', preferencesController);
 if (process.env.NODE_ENV === 'development') {
-  app.use('/docs', express.static('out/docs'));  
+  app.use('/docs', express.static('out/docs'));
 } else {
   app.use('/docs', express.static('docs'));
 }
