@@ -13,25 +13,28 @@ function groupBy(array, keyFunc=(x)=> x, valueFunc=(x)=> x) {
   }, {});
 }
 
+function scoreSearchResult(term, result) {
+  // Grab the String distance of a and b
+  // If the search term is a prefix of this particular item,
+  // it gets a -.5 boost.
+  // To see why, look at the following example.
+  // term = 'Appl'
+  // 'Apple' and 'Appt' both have a string distance of 1, but we
+  // would like to prefer strings that are a prefix so this will give
+  // 'Apple' a string distance of .5 and Appt a string distance of
+  // 1 so that 'Apple comes first'.
+  let levA = new Levenshtein(term, result.name).distance;
+  levA -= result.name.startsWith(term) ? .5 : 0;
+  return levA;
+}
+
 function getTermSortFunc(term) {
   return (a, b) => {
-    // Grab the String distance of a and b
-    // If the search term is a prefix of this particular item,
-    // it gets a -.5 boost.
-    // To see why, look at the following example.
-    // term = 'Appl'
-    // 'Apple' and 'Appt' both have a string distance of 1, but we
-    // would like to prefer strings that are a prefix so this will give
-    // 'Apple' a string distance of .5 and Appt a string distance of
-    // 1 so that 'Apple comes first'.
-    let levA = new Levenshtein(term, a.name).distance;
-    levA -= a.name.startsWith(term) ? .5 : 0;
-    let levB = new Levenshtein(term, b.name).distance;
-    levB -= b.name.startsWith(term) ? .5 : 0;
-
+    let levA = scoreSearchResult(term, a);
+    let levB = scoreSearchResult(term, b);
 
      if (levA == levB) {
-        return a.popularity - b.popularity;
+        return b.popularity - a.popularity;
      }
 
      return levA - levB;
@@ -76,15 +79,27 @@ export default class Searcher {
 
     const data = result.body;
     let output = {
-        artists: data.artists.items.
-            map(this._transformSpotifyObj.bind(this)),
-        tracks: data.tracks.items.map(this._transformSpotifyObj.bind(this)),
-        albums: data.albums.items.map(this._transformSpotifyObj.bind(this)),
+        artists: data.artists.items
+                     .sort(getTermSortFunc(term)),
+        tracks: data.tracks.items
+                    .sort(getTermSortFunc(term)),
+        albums: data.albums.items
+                    .sort(getTermSortFunc(term)),
     };
 
+    const topResults = [];
     for(let key of Object.keys(output)) {
-      output[key] = output[key]
-        .sort(getTermSortFunc(term));
+      if(output[key].length > 0) {
+        topResults.push(output[key][0]);
+      }
+      output[key] = output[key].map(this._transformSpotifyObj.bind(this));
+    }
+
+    if(topResults.length > 0) {
+      let temp = topResults.sort(getTermSortFunc(term))[0];
+      output.top_result = this._transformSpotifyObj(temp);
+    } else {
+      output.top_result = null;
     }
 
     return output;
@@ -158,6 +173,10 @@ export default class Searcher {
 
     if(obj.type === 'track') {
       data.artists = obj.artists.map(this._transformSpotifyObj.bind(this));
+    }
+
+    if(obj.type === 'track') {
+      data.images = obj.album.images || [];
     }
 
     return data;

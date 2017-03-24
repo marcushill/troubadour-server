@@ -16,6 +16,8 @@ const app = new Router();
  * @apiSuccess {Object[]} data.artists
  * @apiSuccess {Object[]} data.albums
  * @apiSuccess {Object[]} data.tracks
+ * @apiSuccess {Object}  data.top_result The single item from data.artists,
+ *      data.albums, or data.tracks with the highest Troubadour Search Score
  * @apiExample Example usage:
  *    GET /search?q=beyonce
  * @apiSuccessExample {json} Success-Response:
@@ -25,7 +27,13 @@ const app = new Router();
  *          "artists": [
  *            {
                  "spotify_id": "6vWDO969PvNqNYHIOW5v0m",
-                 "images": [],
+                 "images": [
+                 {
+                    "height": 1000,
+                    "url": "https://i.scdn.co/image/673cd94546df0536954198867516fee18cee1605",
+                    "width": 1000
+                 },...
+               ],
                  "type": "artist",
                  "name": "Beyoncé",
                  "uri": "spotify:artist:6vWDO969PvNqNYHIOW5v0m"
@@ -49,8 +57,14 @@ const app = new Router();
                 ]
               },...
  *          ]
- *          "albums": [...]
- *       }
+ *          "albums": [...],
+ *          "top_result": {
+              "spotify_id": "6vWDO969PvNqNYHIOW5v0m",
+              "images": [],
+              "type": "artist",
+              "name": "Beyoncé",
+              "uri": "spotify:artist:6vWDO969PvNqNYHIOW5v0m"
+            }
  *     }
  */
 app.get('/', async (req, res) => {
