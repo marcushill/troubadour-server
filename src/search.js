@@ -156,7 +156,7 @@ export default class Searcher {
       uri: obj.uri,
     };
 
-    if(obj.type === 'track') {
+    if(obj.type === 'track' || obj.type == 'album') {
       data.artists = obj.artists.map(this._transformSpotifyObj.bind(this));
     }
 
