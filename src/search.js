@@ -23,9 +23,9 @@ function scoreSearchResult(term, result) {
   // would like to prefer strings that are a prefix so this will give
   // 'Apple' a string distance of .5 and Appt a string distance of
   // 1 so that 'Apple comes first'.
-  let levA = new Levenshtein(term, result.name).distance;
-  levA -= result.name.startsWith(term) ? .5 : 0;
-  return levA;
+  let levResult = new Levenshtein(term, result.name).distance;
+  levResult -= result.name.startsWith(term) ? .5 : 0;
+  return levResult;
 }
 
 function getTermSortFunc(term) {
@@ -171,14 +171,13 @@ export default class Searcher {
       uri: obj.uri,
     };
 
-    if(obj.type === 'track') {
+    if(obj.type === 'track' || obj.type == 'album') {
       data.artists = obj.artists.map(this._transformSpotifyObj.bind(this));
     }
-
+    
     if(obj.type === 'track') {
       data.images = obj.album.images || [];
     }
-
     return data;
   }
 }
