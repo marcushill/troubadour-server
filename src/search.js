@@ -1,5 +1,12 @@
 import SpotifyApi from 'spotify-web-api-node';
 import Levenshtein from 'levenshtein';
+const GENRES = require(process.env.GENRE_FILE);
+// Sometimes it's easier to work with it as a list.
+// Sometimes as a map, so we precompute the map from the list
+const GENRE_MAP = {};
+GENRES.forEach((x) => {
+  GENRE_MAP[x.spotify_id] = x;
+});
 
 function groupBy(array, keyFunc=(x)=> x, valueFunc=(x)=> x) {
   // returns an object of {key: []} where key is returned by keyFunc
@@ -23,8 +30,10 @@ function scoreSearchResult(term, result) {
   // would like to prefer strings that are a prefix so this will give
   // 'Apple' a string distance of .5 and Appt a string distance of
   // 1 so that 'Apple comes first'.
-  let levResult = new Levenshtein(term, result.name).distance;
-  levResult -= result.name.startsWith(term) ? .5 : 0;
+  let resultName = result.name.toLowerCase();
+  let termLowered = term.toLowerCase();
+  let levResult = new Levenshtein(termLowered, resultName).distance;
+  levResult -= resultName.startsWith(termLowered) ? .5 : 0;
   return levResult;
 }
 
@@ -34,7 +43,7 @@ function getTermSortFunc(term) {
     let levB = scoreSearchResult(term, b);
 
      if (levA == levB) {
-        return b.popularity - a.popularity;
+        return (b.popularity || 0) - (a.popularity || 0);
      }
 
      return levA - levB;
@@ -73,7 +82,6 @@ export default class Searcher {
       params.limit = 20;
       params.offet = 20 * page;
     }
-
     let result = await this.spotifyApi
                            .search(term, ['album', 'artist', 'track'], params);
 
@@ -85,6 +93,9 @@ export default class Searcher {
                     .sort(getTermSortFunc(term)),
         albums: data.albums.items
                     .sort(getTermSortFunc(term)),
+        genres: GENRES.filter(
+              (x) => x.name.toLowerCase().indexOf(term.toLowerCase()) != -1)
+                      .sort(getTermSortFunc(term)),
     };
 
     const topResults = [];
@@ -146,6 +157,13 @@ export default class Searcher {
       promises.push(promise);
     }
 
+    if(uriByType.genre) {
+      let promise = Promise.resolve({genres:
+        uriByType.genre.map((x) => GENRE_MAP[x]),
+      });
+      promises.push(promise);
+    }
+
     let finished = await Promise.all(promises);
     let data = finished.reduce((out, item) => {
       return Object.assign(out, item);
@@ -153,7 +171,7 @@ export default class Searcher {
       artists: [],
       albums: [],
       tracks: [],
-      //genres: []
+      genres: [],
     });
 
     for(let key in data) { // eslint-disable-line guard-for-in
@@ -164,7 +182,7 @@ export default class Searcher {
 
   _transformSpotifyObj(obj) {
     let data = {
-      spotify_id: obj.id,
+      spotify_id: obj.id || obj.spotify_id,
       images: obj.images || [],
       type: obj.type,
       name: obj.name,
@@ -174,7 +192,7 @@ export default class Searcher {
     if(obj.type === 'track' || obj.type == 'album') {
       data.artists = obj.artists.map(this._transformSpotifyObj.bind(this));
     }
-    
+
     if(obj.type === 'track') {
       data.images = obj.album.images || [];
     }

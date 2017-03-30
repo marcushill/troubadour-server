@@ -3,6 +3,7 @@ set -x
 if [ $TRAVIS_BRANCH == 'master' ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
     # Initialize a new git repo in out, and push it to our server.
     cp package.json out/ # put the package.json in the right place
+    cp data/genres.json /out
     cd out/
 
     git init
