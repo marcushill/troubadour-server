@@ -16,6 +16,7 @@ const app = new Router();
  * @apiSuccess {Object[]} data.artists
  * @apiSuccess {Object[]} data.albums
  * @apiSuccess {Object[]} data.tracks
+ * @apiSuccess {Object[]} data.genres
  * @apiSuccess {Object}  data.top_result The single item from data.artists,
  *      data.albums, or data.tracks with the highest Troubadour Search Score
  * @apiExample Example usage:
@@ -58,6 +59,15 @@ const app = new Router();
               },...
  *          ]
  *          "albums": [...],
+ *          "genres": [
+ *            {
+ *              "spotify_id": "pop",
+ *              "images": [],
+ *              "type": "artist",
+ *              "name": "Pop",
+ *              "uri": "spotify:genre:pop"
+ *            }
+ *          ],
  *          "top_result": {
               "spotify_id": "6vWDO969PvNqNYHIOW5v0m",
               "images": [],

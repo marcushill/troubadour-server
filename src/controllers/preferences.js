@@ -19,6 +19,7 @@ app.use(requireHeader({
  * @apiSuccess {Object[]} data.artists
  * @apiSuccess {Object[]} data.albums
  * @apiSuccess {Object[]} data.tracks
+ * @apiSuccess {Object[]} data.genres
  *
  * @apiExample Example usage:
  *  GET /preferences
