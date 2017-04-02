@@ -8,6 +8,7 @@ CREATE TABLE playlist (
   party_location geography(POINT, 4326),
   radius integer
 );
+
 DROP INDEX IF EXISTS playlist_party_location_index;
 CREATE INDEX playlist_party_location_index
   ON playlist
