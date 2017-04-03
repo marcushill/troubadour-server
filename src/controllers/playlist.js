@@ -23,14 +23,19 @@ app.get('/', async (req, resp) => {
     resp.json({data: playlists});
   } catch (error) {
     resp.status(500).json({error: error.message});
-  }
+}
 });
 
 app.post('/', async (req, resp) => {
-  let userId = req.get('X-USER-ID');
-  let apiKey = req.get('X-API-KEY');
-  let playlists = await new Playlist(userId)
-    .createPlaylist(apiKey, req.body);
+  try {
+    let userId = req.get('X-USER-ID');
+    let apiKey = req.get('X-API-KEY');
+    let playlists = await new Playlist(userId)
+      .createPlaylist(apiKey, req.body);
+    resp.json({data: playlists});
+  } catch (error) {
+    resp.status(500).json({error: error.message});
+  }
 });
 
 export default app;

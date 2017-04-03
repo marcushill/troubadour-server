@@ -1,5 +1,6 @@
 import SpotifyApi from 'spotify-web-api-node';
 import Levenshtein from 'levenshtein';
+import {groupBy} from './helpers';
 const GENRES = require(process.env.GENRE_FILE);
 // Sometimes it's easier to work with it as a list.
 // Sometimes as a map, so we precompute the map from the list
@@ -8,17 +9,6 @@ GENRES.forEach((x) => {
   GENRE_MAP[x.spotify_id] = x;
 });
 
-function groupBy(array, keyFunc=(x)=> x, valueFunc=(x)=> x) {
-  // returns an object of {key: []} where key is returned by keyFunc
-  return array.reduce((obj, current) => {
-    let key = keyFunc(current);
-    if(!(key in obj)) {
-      obj[key] = [];
-    }
-    obj[key].push(valueFunc(current));
-    return obj;
-  }, {});
-}
 
 function scoreSearchResult(term, result) {
   // Grab the String distance of a and b
