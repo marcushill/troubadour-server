@@ -9,7 +9,6 @@ app.use(requireHeader({
   error_message: `Missing Header: X-USER-ID`,
 }));
 
-
 app.use(requireHeader({
   header_name: 'X-API-KEY',
   error_message: `Missing Header: X-API-KEY`,
@@ -166,5 +165,70 @@ app.put('/:playlistId', async (req, resp) => {
     resp.status(500).json({error: error.message});
   }
 });
+
+/* eslint-disable max-len */
+/**
+ * @api {DELETE} /playlist/:playlistId Delete Playlist
+ * @apiName Delete a specific Troubadour Playlist
+ * @apiGroup Playlist
+ * @apiHeader {String} X-USER-ID The ID of the current user
+ * @apiHeader {String} X-API-KEY The Spotify API Key to use for this request
+ *
+ * @apiParam :playlistId The id returned by GET /playlist or /POST playlist
+ *
+ * @apiSuccess {Boolean} data The success status of the operation
+ *
+ * @apiExample Example usage:
+ *  DELETE /playlist/party2
+ * @apiSuccessExample {json} Success-Response:
+ * {
+    "data":  true
+  }
+ */
+ /* eslint-disable max-len */
+app.delete('/:playlistId', async (req, resp) => {
+  try {
+    let userId = req.get('X-USER-ID');
+    let apiKey = req.get('X-API-KEY');
+    let result = await new Playlist(userId)
+      .deletePlaylist(apiKey, req.params.playlistId);
+    resp.json({data: result});
+  } catch (error) {
+    resp.status(500).json({error: error.message});
+  }
+});
+
+/* eslint-disable max-len */
+/**
+ * @api {DELETE} /playlist/:playlistId Delete Playlists
+ * @apiName Delete ALL Troubadour Playlists
+ * @apiGroup Playlist
+ * @apiHeader {String} X-USER-ID The ID of the current user
+ * @apiHeader {String} X-API-KEY The Spotify API Key to use for this request
+ *
+ * @apiParam :playlistId The id returned by GET /playlist or /POST playlist
+ *
+ * @apiSuccess {Boolean} data The success status of the operation
+ *
+ * @apiExample Example usage:
+ *  DELETE /playlist
+ * @apiSuccessExample {json} Success-Response:
+ * {
+    "data":  true
+  }
+ */
+ /* eslint-disable max-len */
+app.delete('/', async (req, resp) => {
+  try {
+    let userId = req.get('X-USER-ID');
+    let apiKey = req.get('X-API-KEY');
+    let result = await new Playlist(userId)
+      .deletePlaylists(apiKey);
+    resp.json({data: result});
+  } catch (error) {
+    resp.status(500).json({error: error.message});
+  }
+});
+
 
 export default app;

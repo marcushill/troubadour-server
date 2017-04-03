@@ -49,6 +49,42 @@ export class Playlist {
     return temp.map(fixPlaylist);
   }
 
+  async deletePlaylist(apiKey, playlistId) {
+    let spotifyApi = new SpotifyApi();
+    spotifyApi.setAccessToken(apiKey);
+    let user = await spotifyApi.getMe();
+    user = user.body;
+    await spotifyApi.unfollowPlaylist(user.id, playlistId);
+    await db.Playlist.destroy({
+      where: {playlist_id: playlistId},
+    });
+    return true;
+  }
+
+  async deletePlaylists(apiKey) {
+    let spotifyApi = new SpotifyApi();
+    spotifyApi.setAccessToken(apiKey);
+
+    let user = await spotifyApi.getMe();
+    user = user.body;
+
+    let playlists = await db.Playlist.findAll({
+      attributes: ['playlist_id'],
+      where: {created_by: this.userId},
+    });
+
+
+    let deletePromises = playlists
+      .map((x) => x.playlist_id)
+      .map((x) => spotifyApi.unfollowPlaylist(user.id, x));
+    deletePromises.push(
+      db.Playlist.destroy({where:
+        {created_by: this.userId},
+      }));
+    await Promise.all(deletePromises);
+    return true;
+  }
+
   async updatePlaylist(playlistId, playlist) {
     let results = await db.Playlist.update({
       party_location: {
