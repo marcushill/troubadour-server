@@ -107,7 +107,7 @@ app.post('/', async (req, resp) => {
     let apiKey = req.get('X-API-KEY');
     let playlists = await new Playlist(userId)
       .createPlaylist(apiKey, req.body);
-    resp.json({data: playlists});
+    resp.status(201).json({data: playlists});
   } catch (error) {
     resp.status(500).json({error: error.message});
   }
