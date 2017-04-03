@@ -5,7 +5,7 @@ import SpotifyApi from 'spotify-web-api-node';
 import {groupBy} from './helpers';
 import request from 'request-promise';
 
-const SPOTIFY_BASE = "https://api.spotify.com/v1/users/";
+const SPOTIFY_BASE = 'https://api.spotify.com/v1/users/';
 
 export class Playlist {
 
@@ -58,22 +58,22 @@ export class Playlist {
     let tracks = await this.getTracksFromSeeds(spotifyApi, seeds);
     let [user, playlist] = await this.createEmptyPlaylist(spotifyApi);
 
-    let promises = []
+    let promises = [];
     promises.push(this.
                   addTracksToPlaylist(apiKey, user.id, playlist.id, tracks));
 
     let promise = db.Playlist.findOrCreate({
       where: {
-        playlist_id: playlist.id
+        playlist_id: playlist.id,
       },
       defaults: {
         created_by: this.userId,
         in_progress: true,
-        party_location: {lat, long}
-      }
+        party_location: {lat, long, radius},
+      },
     });
     promises.push(promise);
-    let [_, result] = await Promise.all(promises);
+    let [_, result] = await Promise.all(promises); //eslint-disable-line
     result = result[0];
     return Object.assign({}, result.toJSON(), {radius: undefined});
   }
@@ -88,10 +88,10 @@ export class Playlist {
       'seed_tracks': groupedSeeds.track,
       'seed_albums': groupedSeeds.album,
     });
-    return tracks.body.tracks.map(x => x.uri);
+    return tracks.body.tracks.map((x) => x.uri);
   }
 
-  async addTracksToPlaylist(apiKey, userId, playlistId, tracks){
+  async addTracksToPlaylist(apiKey, userId, playlistId, tracks) {
     // don't use spotify-api-node b/c it is broken
     const uriEncode = encodeURIComponent;
     const url = SPOTIFY_BASE +
@@ -101,9 +101,8 @@ export class Playlist {
               .post(url, {
                 headers: {'Authorization': `Bearer ${apiKey}`},
                 body: {uris: tracks},
-                json:true
+                json: true,
               }); //eslint-disable-line
-
   }
 
   async createEmptyPlaylist(spotifyApi) {
@@ -111,7 +110,7 @@ export class Playlist {
     user = user.body;
     // TODO: Name the playlist better
     let playlist = await spotifyApi.createPlaylist(user.id,
-                                                    "Troubadour Test");
+                                                    'Troubadour Test');
     return [user, playlist.body];
   }
 
