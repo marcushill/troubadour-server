@@ -12,6 +12,8 @@ export default function(sequelize, DataTypes) {
     party_location: {
       type: DataTypes.GEOGRAPHY('Point', 4326), // eslint-disable-line new-cap
       get() {
+        let partyLocation = this.getDataValue('party_location');
+        if(!partyLocation) return null;
         let coords = this.getDataValue('party_location').coordinates;
         return {
           lat: coords[0],
@@ -24,8 +26,9 @@ export default function(sequelize, DataTypes) {
           coordinates: [val.lat, val.long],
           crs: {type: 'name', properties: {name: 'EPSG:4326'}},
         });
-
-        this.setDataValue('radius', val.radius);
+        if(val.radius) {
+          this.setDataValue('radius', val.radius);
+        }
       },
     }, // eslint-disable-line
     radius: DataTypes.INTEGER,

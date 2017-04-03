@@ -7,6 +7,12 @@ import request from 'request-promise';
 
 const SPOTIFY_BASE = 'https://api.spotify.com/v1/users/';
 
+function fixPlaylist(playlist) {
+  // For... reasons, we end up with the radius twice
+  return Object.assign({}, playlist.toJSON(), {radius: undefined});
+}
+
+
 export class Playlist {
 
   constructor(userId,
@@ -40,9 +46,23 @@ export class Playlist {
       attributes: {exclude: ['created_by']},
     });
 
-    return temp.map((x) => {
-      return Object.assign({}, x.toJSON(), {radius: undefined});
+    return temp.map(fixPlaylist);
+  }
+
+  async updatePlaylist(playlistId, playlist) {
+    let results = await db.Playlist.update({
+      party_location: {
+        lat: playlist.lat,
+        long: playlist.long,
+        radius: playlist.radius,
+      },
+      in_progress: playlist.in_progress,
+    }, {
+      where: {playlist_id: playlistId},
+      returning: true,
     });
+    console.log('Here');
+    return fixPlaylist(results[1][0]);
   }
 
   async createPlaylist(apiKey, {lat, long, radius=30, preferences}) {
@@ -75,7 +95,7 @@ export class Playlist {
     promises.push(promise);
     let [_, result] = await Promise.all(promises); //eslint-disable-line
     result = result[0];
-    return Object.assign({}, result.toJSON(), {radius: undefined});
+    return fixPlaylist(result);
   }
 
   async getTracksFromSeeds(spotifyApi, seeds) {
