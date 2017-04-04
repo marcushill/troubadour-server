@@ -11,7 +11,7 @@ import searchController from './controllers/search';
 import locationController from './controllers/location';
 import preferencesController from './controllers/preferences';
 import nearbyController from './controllers/nearby';
-
+import playlistController from './controllers/playlist';
 
 const app = express();
 // for parsing application/json
@@ -35,6 +35,7 @@ app.use('/search', searchController);
 app.use('/location', locationController);
 app.use('/preferences', preferencesController);
 app.use('/nearby', nearbyController);
+app.use('/playlist', playlistController);
 
 if (process.env.NODE_ENV === 'development') {
   app.use('/docs', express.static('out/docs'));
