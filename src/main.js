@@ -12,6 +12,7 @@ import locationController from './controllers/location';
 import preferencesController from './controllers/preferences';
 import nearbyController from './controllers/nearby';
 import playlistController from './controllers/playlist';
+import userController from './controllers/user';
 
 const app = express();
 // for parsing application/json
@@ -36,6 +37,7 @@ app.use('/location', locationController);
 app.use('/preferences', preferencesController);
 app.use('/nearby', nearbyController);
 app.use('/playlist', playlistController);
+app.use('/user', userController);
 
 if (process.env.NODE_ENV === 'development') {
   app.use('/docs', express.static('out/docs'));
