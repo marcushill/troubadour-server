@@ -83,6 +83,10 @@ app.get('/', async (req, res) => {
     const search = createCachedFunction(searcher.search,
        {context: searcher, namespace: 'searchController'});
 
+    if(req.query.q == null) {
+      return res.status(400).json({error: 'q param missing'});
+    }
+
     let data = await search(req.query.q, req.query.page);
     res.json({data});
   } catch (err) {

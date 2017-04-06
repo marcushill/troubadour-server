@@ -10,11 +10,10 @@ app.use(requireHeader({
 }));
 
 /**
- * @api {put} /location Update Location
+ * @api {PUT} /location Update Location
  * @apiName Update a User's Location
  * @apiGroup Location
  * @apiHeader {String} X-USER-ID The ID of the current user
- *
  *
  * @apiParam {Number} lat The latitude
  * @apiParam {Number} long The longitude

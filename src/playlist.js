@@ -106,6 +106,12 @@ export class Playlist {
       let temp = await new Nearby().getPreferences({lat, long}, radius);
       preferences = temp.map((x) => x.spotify_uri);
     }
+
+    if (preferences.length == 0) {
+      throw new Error(
+        'No preferences in the requested area and none specified in the body.');
+    }
+
     // aggregation
     let seeds = await this.aggregatePreferences(preferences);
     // spotify
