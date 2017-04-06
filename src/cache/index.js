@@ -15,7 +15,7 @@ const DEFAULT_OPTS = {
   namespace: '',
 };
 
-const CACHE_WAIT_TIME = 200; // wait 200 ms before giving up on the cache
+const CACHE_WAIT_TIME = 500; // wait 400 ms before giving up on the cache
 
 
 export function createCachedFunction(func, opts=DEFAULT_OPTS) {
