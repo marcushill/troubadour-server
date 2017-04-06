@@ -5,7 +5,11 @@ export default function(sequelize, DataTypes) {
     last_location: {
       type: DataTypes.GEOGRAPHY('Point', 4326), // eslint-disable-line new-cap
       get() {
-        let coords = this.getDataValue('last_location').coordinates;
+        let lastLocation = this.getDataValue('last_location');
+        if(!lastLocation) {
+          return null;
+        }
+        let coords = lastLocation.coordinates;
         return {lat: coords[0], long: coords[1]};
       },
       set(val) {

@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {requireHeader} from '../middleware';
-import {UserLocation} from '../location';
+import {User} from '../user';
 
 const app = new Router();
 
@@ -28,8 +28,10 @@ app.put('/', async (req, resp) => {
   try {
     let userId = req.get('X-USER-ID');
     let body = req.body;
-    let data = await new UserLocation(userId).update(body);
-    resp.json({data});
+    let data = await new User(userId).updateLocation(body);
+    if(data) {
+      resp.json({data: 'sent'});
+    }
   } catch (error) {
     resp.status(500).json({error: error.message});
   }
