@@ -1,5 +1,6 @@
 import cacheManager from 'cache-manager';
 import redisStore from 'cache-manager-redis';
+import {TimeoutError, createTimeoutPromise} from '../helpers';
 
 const redisCache = cacheManager.caching({
     store: redisStore,
@@ -14,18 +15,26 @@ const DEFAULT_OPTS = {
   namespace: '',
 };
 
+const CACHE_WAIT_TIME = 200; // wait 200 ms before giving up on the cache
+
+
 export function createCachedFunction(func, opts=DEFAULT_OPTS) {
   opts = Object.assign({}, DEFAULT_OPTS, opts);
-  return (...args) => {
+  return async (...args) => {
     let key = [opts.namespace, func.name].concat(args);
     key = key.map(JSON.stringify).join('-');
 
-    return redisCache.wrap(key, () => {
-      if(opts.context != null) {
-        return func.apply(opts.context, args);
+    func = func.bind(opts.context, ...args);
+
+    try {
+      return await createTimeoutPromise(
+        redisCache.wrap(key, func), CACHE_WAIT_TIME);
+    } catch (e) {
+      if (e instanceof TimeoutError) {
+        return func();
       } else {
-        return func(args);
+        throw e;
       }
-    });
+    }
   };
 }

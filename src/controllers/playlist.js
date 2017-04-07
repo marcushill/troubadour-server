@@ -50,14 +50,10 @@ app.use(requireHeader({
  */
  /* eslint-disable max-len */
 app.get('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     // let apiKey = req.get('X-API-KEY');
     let playlists = await new Playlist(userId).getPlaylists();
     resp.json({data: playlists});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-}
 });
 
 /* eslint-disable max-len */
@@ -102,15 +98,11 @@ app.get('/', async (req, resp) => {
  */
  /* eslint-disable max-len */
 app.post('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let apiKey = req.get('X-API-KEY');
     let playlists = await new Playlist(userId)
       .createPlaylist(apiKey, req.body);
     resp.status(201).json({data: playlists});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 /* eslint-disable max-len */
@@ -156,14 +148,10 @@ app.post('/', async (req, resp) => {
  */
  /* eslint-disable max-len */
 app.put('/:playlistId', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let playlists = await new Playlist(userId)
       .updatePlaylist(req.params.playlistId, req.body);
     resp.json({data: playlists});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 /* eslint-disable max-len */
@@ -187,15 +175,11 @@ app.put('/:playlistId', async (req, resp) => {
  */
  /* eslint-disable max-len */
 app.delete('/:playlistId', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let apiKey = req.get('X-API-KEY');
     let result = await new Playlist(userId)
       .deletePlaylist(apiKey, req.params.playlistId);
     resp.json({data: result});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 /* eslint-disable max-len */
@@ -219,15 +203,11 @@ app.delete('/:playlistId', async (req, resp) => {
  */
  /* eslint-disable max-len */
 app.delete('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let apiKey = req.get('X-API-KEY');
     let result = await new Playlist(userId)
       .deletePlaylists(apiKey);
     resp.json({data: result});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 

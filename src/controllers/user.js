@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {requireHeader} from '../middleware';
 import {User} from '../user';
+import locationController from './location';
 
 
 const app = new Router();
@@ -43,7 +44,6 @@ app.use(requireHeader({
  */
  /* eslint-enable max-len */
 app.get('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let user = await new User(userId).get();
     if (user === null) {
@@ -51,9 +51,6 @@ app.get('/', async (req, resp) => {
     } else {
       resp.json({data: user});
     }
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 
@@ -78,13 +75,12 @@ app.get('/', async (req, resp) => {
  */
  /* eslint-enable max-len */
 app.post('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let created = await new User(userId).create();
+    resp.status(created ? 201: 304);
     return resp.json({data: {created: created}});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
+
+app.use('/location', locationController);
 
 export default app;

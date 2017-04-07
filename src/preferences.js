@@ -1,5 +1,6 @@
 import {database as db} from './startup';
 import Searcher from './search';
+import {TroubadourError} from './helpers';
 
 
 export class Preferences {
@@ -13,7 +14,7 @@ export class Preferences {
                               where: {user_id: this.userId},
                             });
     if(userCount == 0) {
-      throw new Error('User does not exist');
+      throw new TroubadourError('User does not exist', 400);
     }
 
     let preferences = await db.Preference.findAll({

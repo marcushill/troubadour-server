@@ -16,13 +16,9 @@ const app = new Router();
  *    GET /nearby?lat=51.5033640&long=-0.1276250
  */
 app.get('/', async (req, resp) => {
-  try {
     let loc = {lat: req.query.lat, long: req.query.long};
     let data = await new Nearby().getPreferences(loc, req.query.radius);
     resp.json({data});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 export default app;

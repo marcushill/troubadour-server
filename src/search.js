@@ -1,6 +1,6 @@
 import SpotifyApi from 'spotify-web-api-node';
 import Levenshtein from 'levenshtein';
-import {groupBy} from './helpers';
+import {groupBy, TroubadourError} from './helpers';
 const GENRES = require(process.env.GENRE_FILE);
 // Sometimes it's easier to work with it as a list.
 // Sometimes as a map, so we precompute the map from the list
@@ -64,14 +64,21 @@ export default class Searcher {
   }
 
   async search(term, page) {
+    if (!term) {
+      throw new TroubadourError(
+        'The search term is not defined. Check the api docs.', 400);
+    }
     const params = {};
-    this.term = term;
 
     if(Number.isInteger(page) && page > 0) {
       page = page -1;
       params.limit = 20;
       params.offet = 20 * page;
+    } else if (page) {
+      throw new TroubadourError('If defined page must be an integer > 0.',
+                                400);
     }
+
     let result = await this.spotifyApi
                            .search(term, ['album', 'artist', 'track'], params);
 

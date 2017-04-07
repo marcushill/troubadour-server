@@ -15,3 +15,15 @@ export function requireHeader(opts=REQUIRE_HEADER_DEFAULTS) {
     }
   };
 }
+
+export function errorHandler(err, req, res, next) {
+  if (err.status == null) {
+    res.status(500);
+    res.json({error: err.message});
+  } else {
+    res.status(err.status);
+    res.json({error: err.message});
+  }
+
+  next(err);
+}

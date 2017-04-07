@@ -1,4 +1,5 @@
 import {database as db} from './startup';
+import {TroubadourError} from './helpers';
 
 export class User {
   constructor(userId) {
@@ -10,6 +11,12 @@ export class User {
   }
 
   async updateLocation(newLocation) {
+    if(!( newLocation instanceof Object) ||
+       ! Number.isFinite(newLocation.lat) ||
+       ! Number.isFinite(newLocation.long)) {
+         throw new TroubadourError('The entered location is invalid. ' +
+         'See docs at https://api.troubadour.tk/docs. ', 400);
+    }
     await db.TroubadourUser.upsert({
         user_id: this.userId,
         updated_at: db.sequelize.fn('NOW'),

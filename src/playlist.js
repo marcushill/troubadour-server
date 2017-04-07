@@ -1,8 +1,7 @@
 import {database as db} from './startup';
 import {Nearby} from './nearby';
-// import {Searcher} from './search';
 import SpotifyApi from 'spotify-web-api-node';
-import {groupBy} from './helpers';
+import {groupBy, TroubadourError} from './helpers';
 import request from 'request-promise';
 
 const SPOTIFY_BASE = 'https://api.spotify.com/v1/users/';
@@ -108,8 +107,9 @@ export class Playlist {
     }
 
     if (preferences.length == 0) {
-      throw new Error(
-        'No preferences in the requested area and none specified in the body.');
+      throw new TroubadourError(
+        'No preferences in the requested area and none specified in the body.',
+         400);
     }
 
     // aggregation

@@ -25,13 +25,9 @@ app.use(requireHeader({
  *  GET /preferences
  */
 app.get('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let data = await new Preferences(userId).getAll();
     resp.json({data});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 /**
@@ -53,14 +49,10 @@ app.get('/', async (req, resp) => {
  *  ]
  */
 app.put('/', async (req, resp) => {
-  try {
     let userId = req.get('X-USER-ID');
     let body = req.body;
     let data = await new Preferences(userId).add(body);
     resp.json({data});
-  } catch (error) {
-    resp.status(500).json({error: error.message});
-  }
 });
 
 /**
@@ -78,7 +70,6 @@ app.put('/', async (req, resp) => {
 app.delete('/', async (req, resp) => {
   let userId = req.get('X-USER-ID');
   let ids = req.query.ids.split(',');
-  console.log(ids);
   let data = await new Preferences(userId).delete(ids);
   resp.json({data});
 });
