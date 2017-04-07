@@ -1,6 +1,7 @@
 import SpotifyApi from 'spotify-web-api-node';
 import Levenshtein from 'levenshtein';
 import {groupBy, TroubadourError} from './helpers';
+import {tryCacheForeach, cacheItems} from './cache';
 const GENRES = require(process.env.GENRE_FILE);
 // Sometimes it's easier to work with it as a list.
 // Sometimes as a map, so we precompute the map from the list
@@ -122,35 +123,26 @@ export default class Searcher {
 
     let promises = [];
     if (uriByType.artist) {
-      let promise = this.spotifyApi
-              .getArtists(uriByType.artist)
-              .then((result) => {
-                return {
-                  artists: result.body.artists,
-                };
-              } );
+      let promise = this._getArtists(uriByType.artist)
+                        .then((result) => {
+                          return {artists: result};
+                        });
       promises.push(promise);
     }
 
     if (uriByType.track) {
-      let promise = this.spotifyApi
-              .getTracks(uriByType.track)
-              .then((result) => {
-                return {
-                  tracks: result.body.tracks,
-                };
-              });
+      let promise = this._getTracks(uriByType.track)
+                        .then((result) => {
+                          return {tracks: result};
+                        });
       promises.push(promise);
     }
 
     if (uriByType.album) {
-      let promise = this.spotifyApi
-              .getAlbums(uriByType.album)
-              .then((result) => {
-                return {
-                  albums: result.body.albums,
-                };
-              });
+      let promise = this._getAlbums(uriByType.album)
+                        .then((result) => {
+                          return {albums: result};
+                        });
       promises.push(promise);
     }
 
@@ -175,6 +167,51 @@ export default class Searcher {
       data[key] = data[key].map(this._transformSpotifyObj.bind(this));
     }
     return data;
+  }
+
+  async _getArtists(artistUris) {
+    let partition = await tryCacheForeach(artistUris, 'search-artists');
+    let result = partition.found || [];
+
+    let artists = await this.spotifyApi
+            .getArtists(artistUris);
+    artists = artists.body.artists,
+
+    cacheItems(artists.map((x) => {
+      return {key: x.id, value: x};
+    }), 'search-artists');
+
+    return result.concat(artists);
+  }
+
+  async _getTracks(trackUris) {
+    let partition = await tryCacheForeach(trackUris, 'search-tracks');
+    let result = partition.found || [];
+
+    let tracks = await this.spotifyApi
+            .getTracks(trackUris);
+    tracks = tracks.body.tracks,
+
+    cacheItems(tracks.map((x) => {
+      return {key: x.id, value: x};
+    }), 'search-tracks');
+
+    return result.concat(tracks);
+  }
+
+  async _getAlbums(albumUris) {
+    let partition = await tryCacheForeach(albumUris, 'search-albums');
+    let result = partition.found || [];
+
+    let albums = await this.spotifyApi
+            .getAlbums(albumUris);
+    albums = albums.body.albums,
+
+    cacheItems(albums.map((x) => {
+      return {key: x.id, value: x};
+    }), 'search-albums');
+
+    return result.concat(albums);
   }
 
   _transformSpotifyObj(obj) {

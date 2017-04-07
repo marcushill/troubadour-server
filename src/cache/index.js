@@ -1,6 +1,6 @@
 import cacheManager from 'cache-manager';
 import redisStore from 'cache-manager-redis';
-import {TimeoutError, createTimeoutPromise} from '../helpers';
+import {TimeoutError, createTimeoutPromise, groupBy} from '../helpers';
 
 const redisCache = cacheManager.caching({
     store: redisStore,
@@ -17,6 +17,31 @@ const DEFAULT_OPTS = {
 
 const CACHE_WAIT_TIME = 500; // wait 400 ms before giving up on the cache
 
+// Foreach item, if I've got it put it in found otherwise it's in missing
+export async function tryCacheForeach(items, namespace) {
+  let promises = items.map((x) => {
+    let key = [namespace, x];
+    key = key.map(JSON.stringify).join('-').replace(/\"/g, '');
+
+    return createTimeoutPromise(
+        redisCache.get(key), CACHE_WAIT_TIME)
+        .catch((x) => false);
+  });
+
+  let results = await Promise.all(promises);
+  return groupBy(
+    results,
+    (x) => x ? 'found': 'missing'
+  );
+}
+
+export function cacheItems(items, namespace) {
+  for(let item of items) {
+    let key = [namespace, item.key];
+    key = key.map(JSON.stringify).join('-').replace(/\"/g, '');
+    redisCache.set(key, item.value);
+  }
+}
 
 export function createCachedFunction(func, opts=DEFAULT_OPTS) {
   opts = Object.assign({}, DEFAULT_OPTS, opts);
