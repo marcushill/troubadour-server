@@ -2,6 +2,8 @@ import SpotifyApi from 'spotify-web-api-node';
 import Levenshtein from 'levenshtein';
 import {groupBy, TroubadourError} from './helpers';
 import {tryCacheForeach, cacheItems} from './cache';
+const SEARCH_TYPES = ['track', 'genre', 'album', 'artist'];
+
 const GENRES = require(process.env.GENRE_FILE);
 // Sometimes it's easier to work with it as a list.
 // Sometimes as a map, so we precompute the map from the list
@@ -64,7 +66,9 @@ export default class Searcher {
       });
   }
 
-  async search(term, page) {
+  async search(term, page, types) {
+    // Parameter validation
+    let searchGenres = false;
     if (!term) {
       throw new TroubadourError(
         'The search term is not defined. Check the api docs.', 400);
@@ -79,22 +83,42 @@ export default class Searcher {
       throw new TroubadourError('If defined page must be an integer > 0.',
                                 400);
     }
+    let finalTypes = [];
+    if(types) {
+      for(let type of types) {
+        if(SEARCH_TYPES.indexOf(type) == -1) {
+          throw new TroubadourError(
+            `Invalid type: ${type}. Only ${SEARCH_TYPES} are allowed.`);
+        } else if (type === 'genre') {
+          searchGenres = true;
+        } else if (finalTypes.indexOf(type) === -1) {
+          finalTypes.push(type);
+        }
+      }
+    } else {
+      searchGenres = true;
+      finalTypes = ['track', 'artist', 'album'];
+    }
 
-    let result = await this.spotifyApi
-                           .search(term, ['album', 'artist', 'track'], params);
+    // start actual work
+    let output = {};
+    if(finalTypes.length > 0) {
+      let result = await this.spotifyApi
+                             .search(term, finalTypes, params);
 
-    const data = result.body;
-    let output = {
-        artists: data.artists.items
-                     .sort(getTermSortFunc(term)),
-        tracks: data.tracks.items
-                    .sort(getTermSortFunc(term)),
-        albums: data.albums.items
-                    .sort(getTermSortFunc(term)),
-        genres: GENRES.filter(
-              (x) => x.name.toLowerCase().indexOf(term.toLowerCase()) != -1)
-                      .sort(getTermSortFunc(term)),
-    };
+     const data = result.body;
+     for(let key in data) {
+       if(data.hasOwnProperty(key)) {
+         output[key] = data[key].items.sort(getTermSortFunc(term));
+       }
+     }
+    }
+
+    if (searchGenres) {
+      output.genres = GENRES.filter(
+            (x) => x.name.toLowerCase().indexOf(term.toLowerCase()) != -1)
+                    .sort(getTermSortFunc(term));
+    }
 
     const topResults = [];
     for(let key of Object.keys(output)) {

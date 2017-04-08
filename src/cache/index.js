@@ -15,7 +15,7 @@ const DEFAULT_OPTS = {
   namespace: '',
 };
 
-const CACHE_WAIT_TIME = 500; // wait 400 ms before giving up on the cache
+const CACHE_WAIT_TIME = 500; // wait 500 ms before giving up on the cache
 
 // Foreach item, if I've got it put it in found otherwise it's in missing
 export async function tryCacheForeach(items, namespace) {
