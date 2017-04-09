@@ -5,6 +5,7 @@ import {createCachedFunction} from '../cache';
 
 const app = new Router();
 
+/* eslint-disable max-len */
 /**
  * @api {get} /search?q=:q&page=:page Search
  * @apiName Search
@@ -12,7 +13,8 @@ const app = new Router();
  *
  * @apiParam {String} q The query text
  * @apiParam {Number} [page] Which page of size 20 you want. Starts from 1
-
+ * @apiParam {String[]} type A comma separated list of the types of objects you want to search through.
+ * @apiParam {Object}  type.item A single type of object Options are: track, genre, album, and artists
  * @apiSuccess {Object} data Wrapper for the response arrays
  * @apiSuccess {Object[]} data.artists
  * @apiSuccess {Object[]} data.albums
@@ -83,8 +85,9 @@ app.get('/', async (req, res) => {
     const searcher = new Searcher();
     const search = createCachedFunction(searcher.search,
        {context: searcher, namespace: 'searchController'});
+    let types = req.query.type ? req.query.type.split(',') : null;
 
-    let data = await search(req.query.q, req.query.page);
+    let data = await search(req.query.q, req.query.page, types);
     res.json({data});
 });
 
