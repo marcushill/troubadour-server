@@ -5,6 +5,7 @@ import {groupBy, TroubadourError} from './helpers';
 import request from 'request-promise';
 
 const SPOTIFY_BASE = 'https://api.spotify.com/v1/users/';
+const GENRES = require(process.env.GENRE_FILE);
 
 function fixPlaylist(playlist) {
   // For... reasons, we end up with the radius twice
@@ -13,9 +14,7 @@ function fixPlaylist(playlist) {
 
 
 export class Playlist {
-
-  constructor(userId,
-              accessToken) {
+  constructor(userId, accessToken) {
     this.userId = userId;
   }
 
@@ -101,7 +100,7 @@ export class Playlist {
   }
 
   async createPlaylist(apiKey, {lat, long, radius=30, preferences}) {
-    if(!preferences) {
+    if (!preferences) {
       let temp = await new Nearby().getPreferences({lat, long}, radius);
       preferences = temp.map((x) => x.spotify_uri);
     }
@@ -112,11 +111,12 @@ export class Playlist {
          400);
     }
 
-    // aggregation
-    let seeds = await this.aggregatePreferences(preferences);
     // spotify
     const spotifyApi = new SpotifyApi();
     spotifyApi.setAccessToken(apiKey);
+
+    // aggregation
+    let seeds = await this.aggregatePreferences(spotifyApi, preferences);
     let tracks = await this.getTracksFromSeeds(spotifyApi, seeds);
     let [user, playlist] = await this.createEmptyPlaylist(spotifyApi);
 
@@ -176,25 +176,164 @@ export class Playlist {
     return [user, playlist.body];
   }
 
-  async aggregatePreferences(spotifyUris) {
-    if(spotifyUris.length <= 5) {
+  async aggregatePreferences(spotifyApi, spotifyUris) {
+    if (spotifyUris.length <= 5) {
       return spotifyUris;
-    } else {
-      // squashing code here
-      // Spotify call to get all artists and albums for each track
-      // Merge those into the original lists and do a call to get all info for
-      // albums and artists
-      // Merge the genres off of the albums and artists into the genres list and
-      // Merge the artists of the albums into the artists list
-      // Do a final pass over the entire structure to get (running totals):
-      // {artists: [{uri: "", count: 2, ratio: 0.2}],
-      //  genres: [{uri: "", count: 7, ratio: 0.3}]
-      //  Do a filter on each list of ratio < SOME_CONSTANT
-      //  NOTE: It might be more efficient to do the filter while doing the
-      //    totals, but it might get messy.
-      // Sort by count and take top 3 artists and top 2 genres
-      // Or for now...
-      return spotifyUris.slice(0, 4);
     }
+
+    /* Group URIs by type, reduce to list of responses for each type */
+    let promises = [];
+
+    let uriByType = groupBy(spotifyUris,
+      (uri) => uri.split(':')[1], // grabs the type from the uri
+      (uri) => uri.split(':')[2]  // grabs the id
+    );
+
+    if (uriByType.artist) {
+      let promise = spotifyApi
+          .getArtists(uriByType.artist)
+          .then((result) => {
+            return {
+              artists: result.body.artists,
+            };
+          });
+
+      promises.push(promise);
+    }
+
+    if (uriByType.track) {
+      let promise = spotifyApi
+          .getTracks(uriByType.track)
+          .then((result) => {
+            return {
+              tracks: result.body.tracks,
+            };
+          });
+
+      promises.push(promise);
+    }
+
+    if (uriByType.album) {
+      let promise = spotifyApi
+          .getAlbums(uriByType.album)
+          .then((result) => {
+            return {
+              albums: result.body.albums,
+            };
+          });
+
+      promises.push(promise);
+    }
+
+    let finished = await Promise.all(promises);
+    let data = finished.reduce((out, item) => {
+      return Object.assign(out, item);
+    }, {
+      artists: [],
+      albums: [],
+      tracks: [],
+    });
+
+    /* Get artists from albums and tracks */
+    let additionalArtists = [];
+
+    for(let i = 0; i < data.albums.length; i++) {
+      for (let artist of data.albums[i].artists) {
+        additionalArtists.push(artist.id);
+      }
+    }
+
+    for (let i = 0; i < data.tracks.length; i++) {
+      for (let artist of data.tracks[i].artists) {
+        additionalArtists.push(artist.id);
+      }
+    }
+
+    let value = await spotifyApi.getArtists(additionalArtists);
+    let artists = data.artists.concat(value.body.artists);
+
+    /* Get frequencies for each artist and genre. */
+    let artistCount = {};
+    let genreCount = {};
+    let artistTotal = 0;
+    let genreTotal = 0;
+    let genreURI = '';
+
+    for (let genre of uriByType.genre) {
+      genreURI = 'spotify:genre:' + genre;
+      if (!(genreURI in genreCount)) {
+        genreCount[genreURI] = 1;
+      } else {
+        genreCount[genreURI] += 1;
+      }
+      genreTotal += 1;
+    }
+
+    for (let artist of artists) {
+      if (artist.genres) {
+        for (let genre in artist.genres) {
+          if (genre in GENRES) {
+            genreURI = 'spotify:genre:' + genre;
+            if (!(genreURI in genreCount)) {
+              genreCount[genreURI] = 1;
+            } else {
+              genreCount[genreURI] += 1;
+            }
+            genreTotal += 1;
+          }
+        }
+      }
+
+      if (!(artist.uri in artistCount)) {
+        artistCount[artist.uri] = 1;
+      } else {
+        artistCount[artist.uri] += 1;
+      }
+      artistTotal += 1;
+    }
+
+    /* Filter out preferences below the popularity threshold. */
+    let sortedArtist = [];
+    let sortedGenre = [];
+    let ratio = 0;
+
+    for (let artist in artistCount) {
+      ratio = artistCount[artist] * (1.0 / artistTotal);
+   // if (ratio >= .25) {
+        sortedArtist.push([artist, ratio]);
+   // }
+    }
+
+    for (let genre in genreCount) {
+      ratio = genreCount[genre] * (1.0 / genreTotal);
+   // if (ratio >= .25) {
+        sortedGenre.push([genre, ratio]);
+   // }
+    }
+
+    /* Sort by ratio and return the most popular references */
+    let final = [];
+
+    sortedArtist.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    sortedGenre.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    for (let i = 0; i < 3; i++) {
+      if (i < sortedArtist.length) {
+        final.push(sortedArtist[i][0]);
+      }
+    }
+
+    for (let i = 0; i < 2; i++) {
+      if (i < sortedGenre.length) {
+        final.push(sortedGenre[i][0]);
+      }
+    }
+
+    return final;
   }
 }
