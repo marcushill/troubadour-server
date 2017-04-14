@@ -8,6 +8,7 @@
     "no-console": 0,
     "require-jsdoc": 0,
     "valid-jsdoc": 0,
+    "guard-for-in": 0,
     "async-await/space-after-async": 2,
     "async-await/space-after-await": 2
   },
