@@ -19,19 +19,30 @@ const CACHE_WAIT_TIME = 500; // wait 500 ms before giving up on the cache
 
 // Foreach item, if I've got it put it in found otherwise it's in missing
 export async function tryCacheForeach(items, namespace) {
-  let promises = items.map((x) => {
-    let key = [namespace, x];
+  let promises = items.map((item) => {
+    let key = [namespace, item];
     key = key.map(JSON.stringify).join('-').replace(/\"/g, '');
 
     return createTimeoutPromise(
         redisCache.get(key), CACHE_WAIT_TIME)
-        .catch((x) => false);
+        .then((x) => {
+          if(x) {
+            return {found: true, value: x};
+          } else {
+            return {found: false, value: item};
+          }
+        })
+        .catch((x) => {
+          return {found: false, value: item};
+        });
   });
 
   let results = await Promise.all(promises);
+  // console.log(JSON.stringify(results, null, 3));
   return groupBy(
     results,
-    (x) => x ? 'found': 'missing'
+    (x) => x.found ? 'found': 'missing',
+    (x) => x.value
   );
 }
 
