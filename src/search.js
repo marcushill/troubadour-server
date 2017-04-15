@@ -197,45 +197,54 @@ export default class Searcher {
     let partition = await tryCacheForeach(artistUris, 'search-artists');
     let result = partition.found || [];
 
-    let artists = await this.spotifyApi
-            .getArtists(artistUris);
-    artists = artists.body.artists,
+    if(partition.missing && partition.missing.length > 0) {
+      let artists = await this.spotifyApi
+              .getArtists(partition.missing);
+      artists = artists.body.artists,
 
-    cacheItems(artists.map((x) => {
-      return {key: x.id, value: x};
-    }), 'search-artists');
+      cacheItems(artists.map((x) => {
+        return {key: x.id, value: x};
+      }), 'search-artists');
 
-    return result.concat(artists);
+      result = result.concat(artists);
+    }
+
+    return result;
   }
 
   async _getTracks(trackUris) {
     let partition = await tryCacheForeach(trackUris, 'search-tracks');
     let result = partition.found || [];
 
-    let tracks = await this.spotifyApi
-            .getTracks(trackUris);
-    tracks = tracks.body.tracks,
+    if(partition.missing && partition.missing.length > 0) {
+      let tracks = await this.spotifyApi
+              .getTracks(partition.missing);
+      tracks = tracks.body.tracks,
 
-    cacheItems(tracks.map((x) => {
-      return {key: x.id, value: x};
-    }), 'search-tracks');
+      cacheItems(tracks.map((x) => {
+        return {key: x.id, value: x};
+      }), 'search-tracks');
 
-    return result.concat(tracks);
+      result = result.concat(tracks);
+    }
+
+    return result;
   }
 
   async _getAlbums(albumUris) {
     let partition = await tryCacheForeach(albumUris, 'search-albums');
     let result = partition.found || [];
 
-    let albums = await this.spotifyApi
-            .getAlbums(albumUris);
-    albums = albums.body.albums,
-
-    cacheItems(albums.map((x) => {
-      return {key: x.id, value: x};
-    }), 'search-albums');
-
-    return result.concat(albums);
+    if(partition.missing && partition.missing.length > 0) {
+      let albums = await this.spotifyApi
+              .getAlbums(partition.missing);
+      albums = albums.body.albums;
+      cacheItems(albums.map((x) => {
+        return {key: x.id, value: x};
+      }), 'search-albums');
+      result = result.concat(albums);
+    }
+    return result;
   }
 
   _transformSpotifyObj(obj) {
