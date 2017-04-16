@@ -19,8 +19,27 @@ export class Nearby {
         }
     );
 
+    return preferences;
+  }
+
+  async getDistinctPreferences(location, maxDistance=30) {
+    const preferenceUris = await db.sequelize.query(`
+    SELECT DISTINCT pr.spotify_uri
+          FROM troubadour_user u, preference pr
+          WHERE ST_DWITHIN(u.last_location,
+              ST_SetSRID(ST_MakePoint(:latitude, :longitude), 4326),
+                         :maxDistance) AND u.user_id=pr.user_id;
+    `, {
+          type: db.sequelize.QueryTypes.SELECT,
+          replacements: {
+            latitude: location.lat,
+            longitude: location.long,
+            maxDistance: maxDistance,
+          },
+        }
+    );
     const searcher = new Searcher();
     return await searcher.fromSpotifyUris(
-      preferences.map((x) => x.spotify_uri));
+      preferenceUris.map((x) => x.spotify_uri));
   }
 }

@@ -17,7 +17,7 @@ const app = new Router();
  */
 app.get('/', async (req, resp) => {
     let loc = {lat: req.query.lat, long: req.query.long};
-    let data = await new Nearby().getPreferences(loc, req.query.radius);
+    let data = await new Nearby().getDistinctPreferences(loc, req.query.radius);
     resp.json({data});
 });
 

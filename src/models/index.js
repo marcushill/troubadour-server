@@ -3,7 +3,9 @@ let fs = require('fs');
 let path = require('path');
 let Sequelize = require('sequelize');
 
-let sequelize = new Sequelize(process.env.CONNECTION_STRING);
+let sequelize = new Sequelize(process.env.CONNECTION_STRING, {
+  logging: process.env.NODE_ENV == 'development' ? console.log : false,
+});
 let db = {};
 
 fs
