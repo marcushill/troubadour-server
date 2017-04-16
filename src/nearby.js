@@ -1,4 +1,5 @@
 import {database as db} from './startup';
+import Searcher from './search';
 
 export class Nearby {
   async getPreferences(location, maxDistance=30) {
@@ -18,6 +19,8 @@ export class Nearby {
         }
     );
 
-    return preferences;
+    const searcher = new Searcher();
+    return await searcher.fromSpotifyUris(
+      preferences.map((x) => x.spotify_uri));
   }
 }

@@ -64,11 +64,16 @@ app.get('/', async (req, resp) => {
  * @apiHeader {String} X-USER-ID The ID of the current user
  * @apiHeader {String} X-API-KEY The Spotify API Key to use for this request
  *
- * @apiParam {Object} body
- * @apiParam {Number} body.lat Latitude
- * @apiParam {Number} body.long Longitude
- * @apiParam {Number} [body.radius] The radius of the fence IN METERS. Defaults to 30
- * @apiParam {String[]} [body.preferences] A list of Spotify uris to override the nearby preferences
+ * @apiParam {Number} lat Latitude
+ * @apiParam {Number} long Longitude
+ * @apiParam {Number} [radius] The radius of the fence IN METERS. Defaults to 30
+ * @apiParam {String[]} [preferences] A list of Spotify uris to override the nearby preferences
+ * @apiParamExample {json} Input
+ * {
+ *     "lat": 33.12,
+ *     "long": -10.2,
+ *     "radius": 20
+ * }
  *
  * @apiSuccess {Object} data The created playist
  * @apiSuccess {Object} data An individual playlist
@@ -114,11 +119,10 @@ app.post('/', async (req, resp) => {
  * @apiHeader {String} X-API-KEY The Spotify API Key to use for this request
  *
  * @apiParam :playlistId The id returned by GET /playlist or /POST playlist
- * @apiParam {Object} body
- * @apiParam {Number} [body.lat] Latitude
- * @apiParam {Number} [body.long] Longitude
- * @apiParam {Number} [body.radius] The radius of the fence IN METERS. Defaults to 30
- * @apiParam {Boolean} [body.in_progress] Whether or not the party is considered active
+ * @apiParam {Number} [lat] Latitude
+ * @apiParam {Number} [long] Longitude
+ * @apiParam {Number} [radius] The radius of the fence IN METERS. Defaults to 30
+ * @apiParam {Boolean} [in_progress] Whether or not the party is considered active
  *
  * @apiSuccess {Object[]} data A list of Playlists for this user
  * @apiSuccess {Object} data.item An individual playlist

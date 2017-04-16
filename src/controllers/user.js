@@ -56,10 +56,10 @@ app.get('/', async (req, resp) => {
 
 /* eslint-disable max-len */
 /**
- * @api {GET} /user Get User
- * @apiName Get User Details
+ * @api {POST} /user Create User
+ * @apiName Creates a given user
  * @apiGroup User
- * @apiHeader {String} X-USER-ID The ID of the current user
+ * @apiHeader {String} X-USER-ID The ID of the user to be created
  *
  * @apiSuccess {Object} data
  * @apiSuccess {Boolean} created Whether the user had to be created

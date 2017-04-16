@@ -30,17 +30,18 @@ app.get('/', async (req, resp) => {
     resp.json({data});
 });
 
+/* eslint-disable max-len */
 /**
  * @api {put} /preferences Update Preferences
  * @apiName Update User Preferences
  * @apiGroup Preferences
  * @apiHeader {String} X-USER-ID The ID of the current user
  *
- * @apiParam {Object[]} body The list of preferences to add
- * @apiParam {Object} body.item A single preference
- * @apiParam {String} body.item.spotify_uri A string representing the
+ * @apiParam {Object[]} preferences The list of preferences to add
+ * @apiParam {Object} preferences.item A single preference
+ * @apiParam {String} preferences.item.spotify_uri A string representing the
  *      Spotify uri
- * @apiParam {String} body.item.name A user readable representation of the
+ * @apiParam {String} preferences.item.name A user readable representation of the
  *      preference
  * @apiExample Example usage:
  *  PUT /preferences
@@ -48,6 +49,7 @@ app.get('/', async (req, resp) => {
  *   {name: "Beyoncé", spotify_uri: "spotify:artist:6vWDO969PvNqNYHIOW5v0m"}
  *  ]
  */
+ /* eslint-enable max-len */
 app.put('/', async (req, resp) => {
     let userId = req.get('X-USER-ID');
     let body = req.body;
