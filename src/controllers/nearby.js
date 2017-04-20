@@ -1,12 +1,18 @@
 import {Router} from 'express';
 import {Nearby} from '../nearby';
+import {requireHeader} from '../middleware';
 
 const app = new Router();
 
+app.use(requireHeader({
+  header_name: 'X-USER-ID',
+  error_message: `Missing Header: X-USER-ID`,
+}));
 /**
  * @api {get} /nearby?lat=:lat&long=:long Nearby
  * @apiName Nearby Preferences
  * @apiGroup Nearby
+ * @apiHeader {String} X-USER-ID The ID of the current user
  *
  * @apiParam {Number} lat The latitude
  * @apiParam {Number} long The longitude
@@ -17,7 +23,9 @@ const app = new Router();
  */
 app.get('/', async (req, resp) => {
     let loc = {lat: req.query.lat, long: req.query.long};
-    let data = await new Nearby().getDistinctPreferences(loc, req.query.radius);
+    let userId = req.get('X-USER-ID');
+    let data = await new Nearby(userId)
+            .getDistinctPreferences(loc, req.query.radius);
     resp.json({data});
 });
 

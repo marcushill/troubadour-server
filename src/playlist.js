@@ -23,17 +23,21 @@ export class Playlist {
     return db.sequelize.query(`
       SELECT pr.*
       FROM troubadour_user u
-      JOIN (select party_location,radius
+      JOIN (select party_location, radius
         from playlist where playlist_id=:playlist_id) locations
         ON ST_DWITHIN(locations.party_location, u.last_location, locations.radius)
       JOIN preference pr
-        ON pr.user_id = u.user_id;
+        ON pr.user_id = u.user_id
+      WHERE preference.spotify_uri NOT IN (
+        select spotify_uri from user_blacklist where user_id=:user_id
+      );
     `,
     /* eslint-enable max-len*/
      {
       model: db.Preference,
       replacements: {
         playlist_id: playlistId,
+        user_id: this.userId,
       },
     });
   }
@@ -101,7 +105,8 @@ export class Playlist {
 
   async createPlaylist(apiKey, {lat, long, radius=30, preferences}) {
     if (!preferences) {
-      let temp = await new Nearby().getPreferences({lat, long}, radius);
+      let temp = await new Nearby(this.userId)
+                .getPreferences({lat, long}, radius);
       preferences = temp.map((x) => x.spotify_uri);
     }
 

@@ -188,14 +188,12 @@ app.delete('/:playlistId', async (req, resp) => {
 
 /* eslint-disable max-len */
 /**
- * @api {DELETE} /playlist/:playlistId Delete Playlists
+ * @api {DELETE} /playlist/ Delete Playlists
  * @apiName Delete ALL Troubadour Playlists
  * @apiGroup Playlist
  * @apiHeader {String} X-USER-ID The ID of the current user
  * @apiHeader {String} X-API-KEY The Spotify API Key to use for this request
- *
- * @apiParam :playlistId The id returned by GET /playlist or /POST playlist
- *
+ * *
  * @apiSuccess {Boolean} data The success status of the operation
  *
  * @apiExample Example usage:

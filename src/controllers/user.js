@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {requireHeader} from '../middleware';
 import {User} from '../user';
 import locationController from './location';
+import blacklistController from './blacklist';
 
 
 const app = new Router();
@@ -82,5 +83,6 @@ app.post('/', async (req, resp) => {
 });
 
 app.use('/location', locationController);
+app.use('/blacklist', blacklistController);
 
 export default app;
