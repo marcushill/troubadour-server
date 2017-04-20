@@ -153,9 +153,14 @@ app.post('/', async (req, resp) => {
  /* eslint-disable max-len */
 app.put('/:playlistId', async (req, resp) => {
     let userId = req.get('X-USER-ID');
-    let playlists = await new Playlist(userId)
-      .updatePlaylist(req.params.playlistId, req.body);
-    resp.json({data: playlists});
+    let apiKey = req.get('X-API-KEY');
+    if(req.body == null){
+      await new Playlist(userId).updatePlaylistTracks(apiKey, playlistId);
+    } else {
+      let playlists = await new Playlist(userId)
+        .updatePlaylist(req.params.playlistId, req.body);
+      resp.json({data: playlists});
+    }
 });
 
 /* eslint-disable max-len */

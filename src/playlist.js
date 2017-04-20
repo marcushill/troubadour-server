@@ -21,7 +21,7 @@ export class Playlist {
   async getAllPreferencesForPlaylist(playlistId) {
     /* eslint-disable max-len*/
     return db.sequelize.query(`
-      SELECT pr.*
+      SELECT pr.spotify_uri
       FROM troubadour_user u
       JOIN (select party_location,radius
         from playlist where playlist_id=:playlist_id) locations
@@ -99,6 +99,39 @@ export class Playlist {
     return fixPlaylist(results[1][0]);
   }
 
+  async updatePlaylistTracks(apiKey, playlistId){
+    let preferences = this.getAllPreferencesForPlaylist(playlistId)
+      .map(x => x.spotify_uri);
+
+    if (preferences.length == 0) {
+      throw new TroubadourError(
+        'No preferences in the requested area.',
+         400);
+    }
+
+    const spotifyApi = new SpotifyApi();
+    spotifyApi.setAccessToken(apiKey);
+
+    let seeds = await this.aggregatePreferences(spotifyApi, preferences);
+    let tracks = await this.getTracksFromSeeds(spotifyApi, seeds);
+
+    // Update the playlist
+    // Need to figure this out.
+
+    let playlist = await db.Playlist.findOrCreate({
+      where: {
+        playlist_id: playlist.id,
+      },
+      defaults: {
+        created_by: this.userId,
+        in_progress: true,
+        party_location: {lat, long, radius},
+      },
+    });
+
+    return fixPlaylist(playlist);
+  }
+
   async createPlaylist(apiKey, {lat, long, radius=30, preferences}) {
     if (!preferences) {
       let temp = await new Nearby().getPreferences({lat, long}, radius);
@@ -154,7 +187,7 @@ export class Playlist {
   }
 
   async addTracksToPlaylist(apiKey, userId, playlistId, tracks) {
-    // don't use spotify-api-node b/c it is broken
+    // don't use spotify-api-node for this endpoint b/c it is broken
     const uriEncode = encodeURIComponent;
     const url = SPOTIFY_BASE +
       `${uriEncode(userId)}/playlists/${uriEncode(playlistId)}/tracks`;
