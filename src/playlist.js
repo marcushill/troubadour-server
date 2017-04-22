@@ -178,7 +178,10 @@ export class Playlist {
     let formatted = dt.format('Y-m-d H:M:S');
     let user = await spotifyApi.getMe();
     user = user.body;
-    let playlist = await spotifyApi.createPlaylist(user.id, 'Troubadour ' + formatted);
+
+    let playlist = await spotifyApi.
+                   createPlaylist(user.id, 'Troubadour ' + formatted);
+
     return [user, playlist.body];
   }
 
