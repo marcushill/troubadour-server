@@ -175,7 +175,7 @@ export class Playlist {
 
   async createEmptyPlaylist(spotifyApi) {
     let dt = DATETIME.create();
-    let formatted = dt.format('Y-m-d H:M:S');
+    let formatted = dt.format('m-d H:M');
     let user = await spotifyApi.getMe();
     user = user.body;
 
