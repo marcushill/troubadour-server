@@ -4,6 +4,7 @@ import SpotifyApi from 'spotify-web-api-node';
 import {groupBy, TroubadourError} from './helpers';
 import request from 'request-promise';
 
+const DATETIME = require('node-datetime');
 const SPOTIFY_BASE = 'https://api.spotify.com/v1/users/';
 const GENRES = require(process.env.GENRE_FILE);
 
@@ -173,11 +174,11 @@ export class Playlist {
   }
 
   async createEmptyPlaylist(spotifyApi) {
+    let dt = DATETIME.create();
+    let formatted = dt.format('Y-m-d H:M:S');
     let user = await spotifyApi.getMe();
     user = user.body;
-    // TODO: Name the playlist better
-    let playlist = await spotifyApi.createPlaylist(user.id,
-                                                    'Troubadour Test');
+    let playlist = await spotifyApi.createPlaylist(user.id, 'Troubadour ' + formatted);
     return [user, playlist.body];
   }
 
