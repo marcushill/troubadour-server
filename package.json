@@ -36,7 +36,8 @@
     "request-promise": "^4.2.0",
     "sequelize": "^3.30.2",
     "sequelize-cli": "^2.5.1",
-    "spotify-web-api-node": "^2.3.6"
+    "spotify-web-api-node": "^2.3.6",
+    "node-datetime": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
